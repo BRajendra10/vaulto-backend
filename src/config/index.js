@@ -5,6 +5,7 @@ import 'dotenv/config'
 const required = [
   'DB_HOST', 'DB_USER', 'DB_PASSWORD', 'DB_NAME',
   'JWT_SECRET', 'JWT_REFRESH_SECRET', 'ENCRYPTION_KEY',
+  'DEFAULT_AVATAR_URL', 'DEFAULT_AVATAR_PUBLIC_ID'
 ]
 
 for (const key of required) {

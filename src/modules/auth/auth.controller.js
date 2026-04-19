@@ -24,19 +24,49 @@ const register = catchAsync(async (req, res) => {
   if (!errors.isEmpty()) throw new AppError('Validation failed', 400, errors.array())
 
   const { email, password } = req.body
-  const { accessToken, refreshToken } = await authService.register({
-    email, password,
+  const result = await authService.register({ email, password })
+
+  res.status(201).json({
+    status: 'success',
+    message: result.message,
+  })
+})
+
+// ── POST /api/v1/auth/verify-email ────────────────────────────────
+const verifyEmailOTP = catchAsync(async (req, res) => {
+  const errors = validationResult(req)
+  if (!errors.isEmpty()) throw new AppError('Validation failed', 400, errors.array())
+
+  const { email, otp } = req.body
+
+  const { accessToken, refreshToken } = await authService.verifyEmailOTP({
+    email, 
+    otp,
     ipAddress: req.ip,
     userAgent: req.headers['user-agent'],
   })
 
   setAccessTokenCookie(res, accessToken)
 
-  res.status(201).json({
+  res.status(200).json({
     status: 'success',
-    // refreshToken goes in the body — client stores it (localStorage or memory)
-    // accessToken goes in cookie — browser handles it automatically
+    message: 'Email verified successfully.',
     data: { refreshToken },
+  })
+})
+
+// ── POST /api/v1/auth/resend-otp ──────────────────────────────────
+const resendOTP = catchAsync(async (req, res) => {
+  const errors = validationResult(req)
+  if (!errors.isEmpty()) throw new AppError('Validation failed', 400, errors.array())
+
+  const { email } = req.body
+
+  const result = await authService.resendOTP(email)
+
+  res.status(200).json({
+    status: 'success',
+    message: result.message,
   })
 })
 
@@ -99,4 +129,4 @@ const logoutAll = catchAsync(async (req, res) => {
   res.status(200).json({ status: 'success', message: 'All sessions revoked' })
 })
 
-export { register, login, refresh, logout, logoutAll }
+export { register, verifyEmailOTP, resendOTP, login, refresh, logout, logoutAll }

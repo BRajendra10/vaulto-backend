@@ -8,4 +8,4 @@ CREATE TABLE IF NOT EXISTS users (
   auth_provider   ENUM('local', 'google', 'github') DEFAULT 'local',
   created_at      TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   updated_at      TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
-);
+)

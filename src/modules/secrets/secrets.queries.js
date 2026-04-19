@@ -5,8 +5,8 @@ const findAllByProject = `
   JOIN users u ON u.id = s.created_by
   WHERE s.project_id = ? AND s.deleted_at IS NULL
   ORDER BY s.created_at DESC
-  LIMIT ? OFFSET ?
 `
+// LIMIT ? OFFSET ?
 
 const countByProject = `
   SELECT COUNT(*) AS total FROM secret
@@ -23,7 +23,7 @@ const findById = `
 
 const findByKey = `
   SELECT id FROM secret
-  WHERE key = ? AND project_id = ? AND deleted_at IS NULL
+  WHERE 'key' = ? AND project_id = ? AND deleted_at IS NULL
   LIMIT 1
 `
 
@@ -51,8 +51,8 @@ const getAllVersions = `
   JOIN users u ON u.id = sv.created_by
   WHERE sv.secret_id = ?
   ORDER BY sv.version DESC
-  LIMIT ? OFFSET ?
 `
+// LIMIT ? OFFSET ?
 
 const countVersions = `
   SELECT COUNT(*) AS total FROM secret_version WHERE secret_id = ?

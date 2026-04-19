@@ -1,6 +1,6 @@
 import { Router } from 'express'
 import { body } from 'express-validator'
-import { register, login, refresh, logout, logoutAll } from './auth.controller.js'
+import { register, verifyEmailOTP, resendOTP, login, refresh, logout, logoutAll } from './auth.controller.js'
 import authenticate from '../../middlewares/authenticate.js'
 
 const router = Router()
@@ -21,8 +21,19 @@ const loginValidation = [
   body('password').notEmpty().withMessage('Password is required'),
 ]
 
+const verifyEmailValidation = [
+  body('email').isEmail().withMessage('Please provide a valid email').normalizeEmail(),
+  body('otp').isLength({ min: 6, max: 6 }).withMessage('OTP must be 6 digits'),
+]
+
+const resendOTPValidation = [
+  body('email').isEmail().withMessage('Please provide a valid email').normalizeEmail(),
+]
+
 // ── Routes ────────────────────────────────────────────────────────
 router.post('/register',    registerValidation, register)
+router.post('/verify-email', verifyEmailValidation, verifyEmailOTP)
+router.post('/resend-otp',   resendOTPValidation,    resendOTP)
 router.post('/login',       loginValidation,    login)
 router.post('/refresh',                         refresh)
 router.post('/logout',                          logout)

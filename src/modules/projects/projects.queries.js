@@ -4,8 +4,8 @@ const findAllByUser = `
   JOIN maintainer m ON m.project_id = p.id
   WHERE m.user_id = ? AND p.deleted_at IS NULL
   ORDER BY p.created_at DESC
-  LIMIT ? OFFSET ?
 `
+  // LIMIT ? OFFSET ?
 
 const countByUser = `
   SELECT COUNT(*) AS total

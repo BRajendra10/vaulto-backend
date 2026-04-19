@@ -8,8 +8,8 @@ const findUserByEmail = `
 `
 
 const createUser = `
-  INSERT INTO users (email, password, is_email_verified, auth_provider, created_at, updated_at)
-  VALUES (?, ?, false, 'local', NOW(), NOW())
+  INSERT INTO users (email, password, is_email_verified, auth_provider, avatar, avatar_public_id, created_at, updated_at)
+  VALUES (?, ?, false, 'local', ?, ?, NOW(), NOW())
 `
 
 const createSession = `
@@ -34,6 +34,10 @@ const deleteAllUserSessions = `
   DELETE FROM session WHERE user_id = ?
 `
 
+const verifyUserEmail = `
+  UPDATE users SET is_email_verified = true, updated_at = NOW() WHERE id = ?
+`
+
 export {
   findUserByEmail,
   createUser,
@@ -41,4 +45,5 @@ export {
   findSessionByRefreshToken,
   deleteSession,
   deleteAllUserSessions,
+  verifyUserEmail,
 }
