@@ -3,10 +3,10 @@ const findAllByProject = `
          u.id AS user_id, u.email, u.avatar
   FROM maintainer m
   JOIN users u ON u.id = m.user_id
-  WHERE m.project_id = ?
-  ORDER BY m.created_at ASC
-  LIMIT ? OFFSET ?
+  WHERE m.project_id = ? AND m.id > ?
+  ORDER BY m.created_at ASC 
 `
+// LIMIT ?
 
 const countByProject = `
   SELECT COUNT(*) AS total FROM maintainer WHERE project_id = ?
@@ -15,6 +15,10 @@ const countByProject = `
 const findByUserAndProject = `
   SELECT id, role FROM maintainer
   WHERE user_id = ? AND project_id = ? LIMIT 1
+`
+
+const findProjectOwner = `
+  SELECT owner_id FROM project WHERE id = ? LIMIT 1
 `
 
 const findUserByEmail = `
@@ -39,6 +43,7 @@ export {
   findAllByProject,
   countByProject,
   findByUserAndProject,
+  findProjectOwner,
   findUserByEmail,
   addMaintainer,
   updateRole,

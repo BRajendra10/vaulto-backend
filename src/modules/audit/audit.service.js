@@ -13,15 +13,15 @@ const logAction = async ({
   oldValue     = null,
   newValue     = null,
   ipAddress    = null,
-}) => {
+}, connection = pool) => {
   // Look up maintainer_id if this is a project-scoped action
   let maintainerId = null
   if (projectId) {
-    const [rows] = await pool.execute(q.findMaintainerId, [userId, projectId])
+    const [rows] = await connection.execute(q.findMaintainerId, [userId, projectId])
     if (rows.length > 0) maintainerId = rows[0].id
   }
 
-  await pool.execute(q.logAction, [
+  await connection.execute(q.logAction, [
     userId, maintainerId, projectId, secretId,
     secretVersionId, action, oldValue, newValue, ipAddress,
   ])
