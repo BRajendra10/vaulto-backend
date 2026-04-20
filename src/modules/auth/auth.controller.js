@@ -9,12 +9,24 @@ import AppError from '../../utils/AppError.js'
 // httpOnly = JS on the page cannot read this cookie (XSS protection)
 // secure   = only sent over HTTPS in production
 // sameSite = protects against CSRF attacks
-const setAccessTokenCookie = (res, accessToken) => {
-  res.cookie('accessToken', accessToken, {
+const COOKIE_OPTIONS = {
     httpOnly: true,
     secure: process.env.NODE_ENV === 'production',
     sameSite: 'strict',
-    maxAge: 15 * 60 * 1000, // 15 minutes in ms — matches JWT expiry
+}
+
+const setAccessTokenCookie = (res, accessToken) => {
+  res.cookie('accessToken', accessToken, {
+    ...COOKIE_OPTIONS,
+    maxAge: 15 * 60 * 1000, 
+  })
+}
+
+const setRefreshTokenCookie = (res, refreshToken) => {
+  res.cookie('refreshToken', refreshToken, {
+    ...COOKIE_OPTIONS,
+    path: '/api/v1/auth/refresh', // Restricted path
+    maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
   })
 }
 
@@ -47,11 +59,11 @@ const verifyEmailOTP = catchAsync(async (req, res) => {
   })
 
   setAccessTokenCookie(res, accessToken)
+  setRefreshTokenCookie(res, refreshToken)
 
   res.status(200).json({
     status: 'success',
     message: 'Email verified successfully.',
-    data: { refreshToken },
   })
 })
 
@@ -83,38 +95,35 @@ const login = catchAsync(async (req, res) => {
   })
 
   setAccessTokenCookie(res, accessToken)
+  setRefreshTokenCookie(res, refreshToken)
 
   res.status(200).json({
     status: 'success',
-    data: { refreshToken },
   })
 })
 
 // ── POST /api/v1/auth/refresh ─────────────────────────────────────
 const refresh = catchAsync(async (req, res) => {
-  const { refreshToken } = req.body
+  const refreshToken = req.cookies.refreshToken
   if (!refreshToken) throw new AppError('Refresh token is required', 400)
 
   const { accessToken, refreshToken: newRefreshToken } = await authService.refreshAccessToken(refreshToken)
 
-  // Set new access token in cookie and return new refresh token
   setAccessTokenCookie(res, accessToken)
+  setRefreshTokenCookie(res, newRefreshToken)
 
-  res.status(200).json({
-    status: 'success',
-    data: { refreshToken: newRefreshToken },
-  })
+  res.status(200).json({ status: 'success' })
 })
 
 // ── POST /api/v1/auth/logout ──────────────────────────────────────
 const logout = catchAsync(async (req, res) => {
-  const { refreshToken } = req.body
-  if (!refreshToken) throw new AppError('Refresh token is required', 400)
+  const refreshToken = req.cookies.refreshToken
+  if (refreshToken) {
+    await authService.logout(refreshToken)
+  }
 
-  await authService.logout(refreshToken)
-
-  // Clear the access token cookie
-  res.clearCookie('accessToken')
+  res.clearCookie('accessToken', COOKIE_OPTIONS)
+  res.clearCookie('refreshToken', { ...COOKIE_OPTIONS, path: '/api/v1/auth/refresh' })
 
   res.status(200).json({ status: 'success', message: 'Logged out successfully' })
 })

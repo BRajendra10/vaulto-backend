@@ -1,10 +1,15 @@
 CREATE TABLE IF NOT EXISTS session (
   id            INT AUTO_INCREMENT PRIMARY KEY,
   user_id       INT NOT NULL,
-  refresh_token TEXT NOT NULL,
+
+  refresh_token_hash VARCHAR(255) NOT NULL,
+  is_revoked    BOOLEAN DEFAULT false,
+
   expiry_at     TIMESTAMP NOT NULL,
   ip_address    VARCHAR(45),
   user_agent    TEXT,
+  last_used_at  TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  
   created_at    TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   updated_at    TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
 

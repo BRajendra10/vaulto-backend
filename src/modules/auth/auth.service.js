@@ -84,6 +84,7 @@ const verifyEmailOTP = async ({ email, otp, ipAddress, userAgent }) => {
   }
 
   const refreshToken = generateRefreshToken()
+  const refreshTokenHash = hashToken(refreshToken)
   const accessToken = generateAccessToken(user.id, user.email)
 
   const connection = await pool.getConnection()
@@ -91,7 +92,7 @@ const verifyEmailOTP = async ({ email, otp, ipAddress, userAgent }) => {
     await connection.beginTransaction()
     await connection.execute(q.verifyUserEmail, [user.id])
     await connection.execute(otpQ.deleteOTPByUserId, [user.id])
-    await connection.execute(q.createSession, [user.id, refreshToken, getRefreshTokenExpiry(), ipAddress, userAgent])
+    await connection.execute(q.createSession, [user.id, refreshTokenHash, getRefreshTokenExpiry(), ipAddress, userAgent])
     await connection.commit()
   } catch (err) {
     await connection.rollback()
@@ -145,31 +146,47 @@ const login = async ({ email, password, ipAddress, userAgent }) => {
 
   // Create a new session and issue tokens
   const refreshToken = generateRefreshToken()
-  await pool.execute(q.createSession, [user.id, refreshToken, getRefreshTokenExpiry(), ipAddress, userAgent])
+  const refreshTokenHash = hashToken(refreshToken)
+  await pool.execute(q.createSession, [user.id, refreshTokenHash, getRefreshTokenExpiry(), ipAddress, userAgent])
   const accessToken = generateAccessToken(user.id, user.email)
 
   return { accessToken, refreshToken }
 }
 
 const refreshAccessToken = async (refreshToken) => {
-  // Find the session — query already checks expiry_at > NOW()
-  const [rows] = await pool.execute(q.findSessionByRefreshToken, [refreshToken])
-  if (rows.length === 0) throw new AppError('Invalid or expired refresh token', 401)
-
+  const tokenHash = hashToken(refreshToken)
+  const [rows] = await pool.execute(q.findSessionByRefreshToken, [tokenHash])
+  
+  if (rows.length === 0) throw new AppError('Invalid session', 401)
+  
   const session = rows[0]
 
-  // Token rotation — delete old refresh token and issue a new one
-  // This means a stolen refresh token can only be used once
+  // REUSE DETECTION: If token is revoked, someone reused an old token. Compromise!
+  if (session.is_revoked) {
+    await pool.execute(q.deleteAllUserSessions, [session.user_id])
+    throw new AppError('Security compromise detected. All sessions revoked. Please log in again.', 403)
+  }
+
+  // Expiry check
+  if (new Date() > new Date(session.expiry_at)) {
+    await pool.execute(q.deleteSession, [tokenHash])
+    throw new AppError('Session expired', 401)
+  }
+
+  // Rotate Token: Revoke current and issue new
   const newRefreshToken = generateRefreshToken()
-  await pool.execute(q.deleteSession, [refreshToken])
-  await pool.execute(q.createSession, [session.user_id, newRefreshToken, getRefreshTokenExpiry(), session.ip_address, session.user_agent])
+  const newHash = hashToken(newRefreshToken)
+
+  await pool.execute(q.revokeSession, [tokenHash])
+  await pool.execute(q.createSession, [session.user_id, newHash, getRefreshTokenExpiry(), session.ip_address, session.user_agent])
 
   const accessToken = generateAccessToken(session.user_id, session.email)
   return { accessToken, refreshToken: newRefreshToken }
 }
 
 const logout = async (refreshToken) => {
-  await pool.execute(q.deleteSession, [refreshToken])
+  const tokenHash = hashToken(refreshToken)
+  await pool.execute(q.deleteSession, [tokenHash])
 }
 
 const logoutAll = async (userId) => {
