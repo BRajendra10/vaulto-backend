@@ -2,6 +2,7 @@ CREATE TABLE IF NOT EXISTS project (
   id           INT AUTO_INCREMENT PRIMARY KEY,
   project_name VARCHAR(255) NOT NULL,
   owner_id     INT NOT NULL,
+  api_key      VARCHAR(64) UNIQUE,
   is_active    BOOLEAN DEFAULT true,
   deleted_at   TIMESTAMP NULL,
   created_at   TIMESTAMP DEFAULT CURRENT_TIMESTAMP,

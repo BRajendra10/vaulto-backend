@@ -1,3 +1,4 @@
+import crypto from 'crypto'
 import { pool } from '../../db/pool.js'
 import * as q from './projects.queries.js'
 import { logAction } from '../audit/audit.service.js'
@@ -25,6 +26,10 @@ const createProject = async (userId, { project_name }, ipAddress) => {
 
     const [result] = await connection.execute(q.createProject, [project_name, userId])
     const projectId = result.insertId
+
+    // Generate a secure 64-character API key (32 bytes)
+    const apiKey = crypto.randomBytes(32).toString('hex')
+    await connection.execute('UPDATE project SET api_key = ? WHERE id = ?', [apiKey, projectId])
 
     // Automatically add creator as owner in maintainer table
     await connection.execute(q.addOwnerAsMaintainer, [userId, projectId])

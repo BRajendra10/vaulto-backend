@@ -3,6 +3,7 @@ import { body } from 'express-validator'
 import * as secretsController from './secrets.controller.js'
 import authenticate from '../../middlewares/authenticate.js'
 import authorize from '../../middlewares/authorize.js'
+import authenticateApiKey from '../../middlewares/authenticateApiKey.js'
 
 const router = Router()
 
@@ -23,6 +24,12 @@ const rotateValidation = [
 router.get('/:projectId/secrets',
   authenticate, authorize('secret:read'),
   secretsController.getAllSecrets
+)
+
+// Route for Systems/External Sites to fetch a secret value by key
+router.get('/:projectId/fetch',
+  authenticateApiKey,
+  secretsController.getSecretByKey
 )
 
 router.post('/:projectId/secrets',

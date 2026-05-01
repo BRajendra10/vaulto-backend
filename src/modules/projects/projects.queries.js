@@ -15,7 +15,7 @@ const countByUser = `
 `
 
 const findById = `
-  SELECT p.id, p.project_name, p.owner_id, p.is_active, p.created_at, p.updated_at
+  SELECT p.id, p.project_name, p.owner_id, p.api_key, p.is_active, p.created_at, p.updated_at
   FROM project p
   WHERE p.id = ? AND p.deleted_at IS NULL
   LIMIT 1

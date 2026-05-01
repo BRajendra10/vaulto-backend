@@ -23,7 +23,7 @@ const findById = `
 
 const findByKey = `
   SELECT id FROM secret
-  WHERE 'key' = ? AND project_id = ? AND deleted_at IS NULL
+  WHERE \`key\` = ? AND project_id = ? AND deleted_at IS NULL
   LIMIT 1
 `
 

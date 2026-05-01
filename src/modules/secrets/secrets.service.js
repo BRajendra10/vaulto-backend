@@ -27,6 +27,13 @@ const getSecretById = async (projectId, secretId) => {
   return { ...rows[0], value: decryptedValue, environment: versions[0]?.environment }
 }
 
+const getSecretByKey = async (projectId, key) => {
+  const [rows] = await pool.execute(q.findByKey, [key, projectId])
+  if (rows.length === 0) throw new AppError(`Secret with key '${key}' not found`, 404)
+
+  return getSecretById(projectId, rows[0].id)
+}
+
 const createSecret = async (userId, projectId, { key, value, environment, expires_at }, ipAddress) => {
   // Check for duplicate key in this project
   const [existing] = await pool.execute(q.findByKey, [key, projectId])
@@ -134,4 +141,4 @@ const deleteSecret = async (userId, projectId, secretId, ipAddress) => {
   await logAction({ userId, projectId, secretId, action: 'secret.deleted', ipAddress })
 }
 
-export { getAllSecrets, getSecretById, createSecret, updateSecret, rotateSecret, getSecretVersions, deleteSecret }
+export { getAllSecrets, getSecretById, getSecretByKey, createSecret, updateSecret, rotateSecret, getSecretVersions, deleteSecret }

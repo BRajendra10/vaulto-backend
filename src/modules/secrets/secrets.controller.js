@@ -13,6 +13,15 @@ const getSecretById = catchAsync(async (req, res) => {
   res.status(200).json({ status: 'success', data: secret })
 })
 
+const getSecretByKey = catchAsync(async (req, res) => {
+  const { projectId } = req.params
+  const { key } = req.query
+
+  console.log(projectId, key);
+  const secret = await secretsService.getSecretByKey(projectId, key)
+  res.status(200).json({ status: 'success', data: secret })
+})
+
 const createSecret = catchAsync(async (req, res) => {
   const errors = validationResult(req)
   if (!errors.isEmpty()) throw new AppError('Validation failed', 400, errors.array())
@@ -44,4 +53,4 @@ const deleteSecret = catchAsync(async (req, res) => {
   res.status(200).json({ status: 'success', message: 'Secret deleted successfully' })
 })
 
-export { getAllSecrets, getSecretById, createSecret, updateSecret, rotateSecret, getSecretVersions, deleteSecret }
+export { getAllSecrets, getSecretById, getSecretByKey, createSecret, updateSecret, rotateSecret, getSecretVersions, deleteSecret }
