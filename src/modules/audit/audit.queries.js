@@ -20,8 +20,8 @@ const findByProject = `
   LEFT JOIN secret s ON s.id = a.secret_id
   WHERE a.project_id = ?
   ORDER BY a.created_at DESC
-  LIMIT ? OFFSET ?
 `
+// LIMIT ? OFFSET ?
 
 const countByProject = `
   SELECT COUNT(*) AS total FROM audit WHERE project_id = ?
