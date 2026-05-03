@@ -21,7 +21,6 @@ const findByProject = `
   WHERE a.project_id = ?
   ORDER BY a.created_at DESC
 `
-// LIMIT ? OFFSET ?
 
 const countByProject = `
   SELECT COUNT(*) AS total FROM audit WHERE project_id = ?

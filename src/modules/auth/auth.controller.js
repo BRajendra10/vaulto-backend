@@ -10,22 +10,21 @@ import AppError from '../../utils/AppError.js'
 // secure   = only sent over HTTPS in production
 // sameSite = protects against CSRF attacks
 const COOKIE_OPTIONS = {
-    httpOnly: true,
-    secure: process.env.NODE_ENV === 'production',
-    sameSite: 'strict',
+  httpOnly: true,
+  secure: process.env.NODE_ENV === 'production',
+  sameSite: 'lax',
 }
 
 const setAccessTokenCookie = (res, accessToken) => {
   res.cookie('accessToken', accessToken, {
     ...COOKIE_OPTIONS,
-    maxAge: 15 * 60 * 1000, 
+    maxAge: 15 * 60 * 1000,
   })
 }
 
 const setRefreshTokenCookie = (res, refreshToken) => {
   res.cookie('refreshToken', refreshToken, {
     ...COOKIE_OPTIONS,
-    path: '/api/v1/auth/refresh', // Restricted path
     maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
   })
 }
@@ -52,7 +51,7 @@ const verifyEmailOTP = catchAsync(async (req, res) => {
   const { email, otp } = req.body
 
   const { accessToken, refreshToken } = await authService.verifyEmailOTP({
-    email, 
+    email,
     otp,
     ipAddress: req.ip,
     userAgent: req.headers['user-agent'],

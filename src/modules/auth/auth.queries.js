@@ -32,7 +32,7 @@ const revokeSession = `
 `
 
 const deleteSession = `
-  DELETE FROM session WHERE refresh_token = ?
+  DELETE FROM session WHERE refresh_token_hash = ?
 `
 
 const deleteAllUserSessions = `

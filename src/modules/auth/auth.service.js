@@ -156,7 +156,6 @@ const login = async ({ email, password, ipAddress, userAgent }) => {
 const refreshAccessToken = async (refreshToken) => {
   const tokenHash = hashToken(refreshToken)
   const [rows] = await pool.execute(q.findSessionByRefreshToken, [tokenHash])
-  
   if (rows.length === 0) throw new AppError('Invalid session', 401)
   
   const session = rows[0]
