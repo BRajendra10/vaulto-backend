@@ -127,5 +127,3 @@ npm start
 4.  **SQL Injection**: All queries use prepared statements via `mysql2`.
 5.  **Fail-Fast**: Config loader validates environment variables on startup.
 6.  **Generic Errors**: Prevents data leaking via error messages.
-```
-
