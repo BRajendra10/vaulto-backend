@@ -68,19 +68,6 @@ Integrated via `utils/Imagekit.js`:
 - **Pagination**: Standardized `getPagination` and `paginatedResponse` helpers to ensure all list endpoints follow the same metadata structure.
 - **Mailer**: Centralized Nodemailer transporter with HTML/Text support.
 
-## 📡 API Endpoints
-
-### Authentication (`/api/v1/auth`)
-| Method | Path | Description |
-| :--- | :--- | :--- |
-| POST | `/register` | Register new user + send OTP |
-| POST | `/verify-email` | Verify OTP + receive tokens |
-| POST | `/resend-otp` | Securely resend verification code |
-| POST | `/login` | Authenticate + receive tokens |
-| POST | `/refresh` | Rotate session/refresh tokens |
-| POST | `/logout` | Revoke current session |
-| POST | `/logout-all` | Revoke all active sessions (Requires Auth) |
-
 ## ⚙️ Environment Variables
 
 Create a `.env` file in the root directory:
@@ -142,7 +129,3 @@ npm start
 6.  **Generic Errors**: Prevents data leaking via error messages.
 ```
 
-<!--
-[PROMPT_SUGGESTION]Can you help me implement a rate-limiting middleware using express-rate-limit to protect the login and resend-otp routes?[/PROMPT_SUGGESTION]
-[PROMPT_SUGGESTION]How would I extend the session management to allow users to view a list of their active devices and revoke them individually?[/PROMPT_SUGGESTION]
--->
