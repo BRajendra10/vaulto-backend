@@ -1,6 +1,3 @@
-<<<<<<< HEAD
-# vaulto-backend
-=======
 # Vaulto Backend API
 
 Vaulto is a secure **Secrets Management and Vault Service** backend built with Node.js and MySQL. It is designed to provide encrypted storage for sensitive project data with granular access control, detailed audit logging, and a high-assurance authentication framework.
@@ -149,4 +146,3 @@ npm start
 [PROMPT_SUGGESTION]Can you help me implement a rate-limiting middleware using express-rate-limit to protect the login and resend-otp routes?[/PROMPT_SUGGESTION]
 [PROMPT_SUGGESTION]How would I extend the session management to allow users to view a list of their active devices and revoke them individually?[/PROMPT_SUGGESTION]
 -->
->>>>>>> 64f641898a42a5875f9cec11f0dd291c8279e3be
