@@ -17,7 +17,6 @@ const getSecretByKey = catchAsync(async (req, res) => {
   const { projectId } = req.params
   const { key } = req.query
 
-  console.log(projectId, key);
   const secret = await secretsService.getSecretByKey(projectId, key)
   res.status(200).json({ status: 'success', data: secret })
 })

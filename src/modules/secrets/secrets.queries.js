@@ -1,9 +1,29 @@
 const findAllByProject = `
-  SELECT s.id, s.key, s.current_version, s.is_active, s.expires_at, s.created_at, s.updated_at,
-         u.email AS created_by_email
+  SELECT
+  s.id,
+  s.key,
+  s.current_version,
+  s.is_active,
+  s.expires_at,
+  s.created_at,
+  s.updated_at,
+
+  sv.environment,
+
+  u.email AS created_by_email
+
   FROM secret s
-  JOIN users u ON u.id = s.created_by
-  WHERE s.project_id = ? AND s.deleted_at IS NULL
+
+  JOIN users u
+    ON u.id = s.created_by
+
+  LEFT JOIN secret_version sv
+    ON sv.secret_id = s.id
+    AND sv.version = s.current_version
+
+  WHERE s.project_id = ?
+    AND s.deleted_at IS NULL
+
   ORDER BY s.created_at DESC
 `
 // LIMIT ? OFFSET ?
