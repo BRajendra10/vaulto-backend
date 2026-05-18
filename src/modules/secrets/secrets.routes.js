@@ -43,10 +43,22 @@ router.get('/:projectId/secrets/:secretId',
   secretsController.getSecretById
 )
 
+const updateValidation = [
+  body('expires_at').optional().isISO8601().withMessage('expires_at must be a valid date'),
+  // Allow only expires_at to be updated for secret base record.
+  // Other fields are rejected to prevent client-side drift.
+  body('key').optional().notEmpty().withMessage('key cannot be updated'),
+  body('value').optional().notEmpty().withMessage('value cannot be updated; use rotate'),
+  body('environment').optional().notEmpty().withMessage('environment cannot be changed; use rotate'),
+]
+
 router.patch('/:projectId/secrets/:secretId',
-  authenticate, authorize('secret:update'),
+  authenticate,
+  authorize('secret:update'),
+  updateValidation,
   secretsController.updateSecret
 )
+
 
 router.post('/:projectId/secrets/:secretId/rotate',
   authenticate, authorize('secret:rotate'),

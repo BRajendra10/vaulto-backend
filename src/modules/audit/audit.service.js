@@ -29,7 +29,7 @@ const logAction = async ({
 
 const getAuditLog = async (projectId, query) => {
   const { page, limit, offset } = getPagination(query)
-  const [rows] = await pool.execute(`${q.findByProject} LIMIT ${limit} OFFSET ${offset}`, [projectId, limit, offset])
+  const [rows] = await pool.execute(`${q.findByProject} LIMIT ${Number(limit)} OFFSET ${Number(offset)}`, [projectId, limit, offset])
   const [[{ total }]] = await pool.execute(q.countByProject, [projectId])
   return paginatedResponse(rows, total, page, limit)
 }

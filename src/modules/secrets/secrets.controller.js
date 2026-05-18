@@ -30,9 +30,13 @@ const createSecret = catchAsync(async (req, res) => {
 })
 
 const updateSecret = catchAsync(async (req, res) => {
+  const errors = validationResult(req)
+  if (!errors.isEmpty()) throw new AppError('Validation failed', 400, errors.array())
+
   const secret = await secretsService.updateSecret(req.user.id, req.params.projectId, req.params.secretId, req.body, req.ip)
   res.status(200).json({ status: 'success', data: secret })
 })
+
 
 const rotateSecret = catchAsync(async (req, res) => {
   const errors = validationResult(req)

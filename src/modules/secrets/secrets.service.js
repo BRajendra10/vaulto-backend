@@ -7,7 +7,7 @@ import { getPagination, paginatedResponse } from '../../utils/pagination.js'
 
 const getAllSecrets = async (projectId, query) => {
   const { page, limit, offset } = getPagination(query)
-  const [rows] = await pool.execute(`${q.findAllByProject} LIMIT ${limit} OFFSET ${offset}`, [projectId])
+  const [rows] = await pool.execute(`${q.findAllByProject} LIMIT ${Number(limit)} OFFSET ${Number(offset)}`, [projectId, limit, offset])
   const [[{ total }]] = await pool.execute(q.countByProject, [projectId])
   // Never return values in list — only metadata
   return paginatedResponse(rows, total, page, limit)
@@ -124,7 +124,7 @@ const getSecretVersions = async (projectId, secretId, query) => {
   if (secrets.length === 0) throw new AppError('Secret not found', 404)
 
   // const [rows] = await pool.execute(q.getAllVersions, [secretId, limit, offset])
-  const [rows] = await pool.execute(`${q.getAllVersions} LIMIT ${limit} OFFSET ${offset}`, [secretId]);
+  const [rows] = await pool.execute(`${q.getAllVersions} LIMIT ? OFFSET ?`, [secretId, limit, offset])
   const [[{ total }]] = await pool.execute(q.countVersions, [secretId])
 
   // Never return decrypted values in version list
