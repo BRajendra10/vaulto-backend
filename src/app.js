@@ -12,8 +12,10 @@ import projectsRoutes from './modules/projects/projects.routes.js'
 import maintainersRoutes from './modules/maintainers/maintainers.routes.js'
 import secretsRoutes from './modules/secrets/secrets.routes.js'
 import auditRoutes from './modules/audit/audit.routes.js'
+import dashboardRoutes from './modules/dashboard/dashboard.routes.js'
 
 const app = express()
+
 
 // ── Global Middlewares ──────────────────────────────────────────
 app.use(cors({ origin: process.env.CLIENT_URL, credentials: true }))
@@ -34,8 +36,10 @@ app.use('/api/v1/projects', projectsRoutes)
 app.use('/api/v1/projects', maintainersRoutes)
 app.use('/api/v1/projects', secretsRoutes)
 app.use('/api/v1/projects', auditRoutes)
+app.use('/api/v1/dashboard', dashboardRoutes)
 
-// ── 404 Handler ─────────────────────────────────────────────────
+// ── 404 Handler ─────────────────
+
 app.all('*', (req, res, next) => {
   next(new AppError(`Route ${req.originalUrl} not found`, 404))
 })
