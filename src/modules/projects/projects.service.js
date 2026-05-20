@@ -18,12 +18,13 @@ const getProjectById = async (projectId) => {
   return rows[0]
 }
 
-const createProject = async (userId, { project_name }, ipAddress) => {
+const createProject = async (userId, { project_name, description }, ipAddress) => {
+  const desc = description?.trim() || null
   const connection = await pool.getConnection()
   try {
     await connection.beginTransaction()
 
-    const [result] = await connection.execute(q.createProject, [project_name, userId])
+    const [result] = await connection.execute(q.createProject, [project_name, desc, userId])
     const projectId = result.insertId
 
     // Generate a secure 64-character API key (32 bytes)
@@ -48,8 +49,9 @@ const createProject = async (userId, { project_name }, ipAddress) => {
   }
 }
 
-const updateProject = async (userId, projectId, { project_name }, ipAddress) => {
-  const [result] = await pool.execute(q.updateProject, [project_name, projectId])
+const updateProject = async (userId, projectId, { project_name, description }, ipAddress) => {
+  const desc = description?.trim() || null
+  const [result] = await pool.execute(q.updateProject, [project_name, desc, projectId])
   if (result.affectedRows === 0) throw new AppError('Project not found', 404)
 
   await logAction({ userId, projectId, action: 'project.updated', ipAddress })

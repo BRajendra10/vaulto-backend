@@ -1,5 +1,5 @@
 const findAllByUser = `
-  SELECT p.id, p.project_name, p.owner_id, p.is_active, p.created_at, p.updated_at, m.role
+  SELECT p.id, p.project_name, p.description, p.owner_id, p.is_active, p.created_at, p.updated_at, m.role
   FROM project p
   JOIN maintainer m ON m.project_id = p.id
   WHERE m.user_id = ? AND p.deleted_at IS NULL
@@ -15,15 +15,15 @@ const countByUser = `
 `
 
 const findById = `
-  SELECT p.id, p.project_name, p.owner_id, p.api_key, p.is_active, p.created_at, p.updated_at
+  SELECT p.id, p.project_name, p.description, p.owner_id, p.api_key, p.is_active, p.created_at, p.updated_at
   FROM project p
   WHERE p.id = ? AND p.deleted_at IS NULL
   LIMIT 1
 `
 
 const createProject = `
-  INSERT INTO project (project_name, owner_id, is_active, created_at, updated_at)
-  VALUES (?, ?, true, NOW(), NOW())
+  INSERT INTO project (project_name, description, owner_id, is_active, created_at, updated_at)
+  VALUES (?, ?, ?, true, NOW(), NOW())
 `
 
 const addOwnerAsMaintainer = `
@@ -32,7 +32,7 @@ const addOwnerAsMaintainer = `
 `
 
 const updateProject = `
-  UPDATE project SET project_name = ?, updated_at = NOW()
+  UPDATE project SET project_name = ?, description = ?, updated_at = NOW()
   WHERE id = ? AND deleted_at IS NULL
 `
 
