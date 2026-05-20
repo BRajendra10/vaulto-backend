@@ -1,15 +1,22 @@
 // auth.queries.js — raw SQL strings only, no logic here
 
 const findUserByEmail = `
-  SELECT id, email, password, is_email_verified, auth_provider
+  SELECT id, username, email, password, is_email_verified, auth_provider
   FROM users
   WHERE email = ?
   LIMIT 1
 `
 
+const findUserByUsername = `
+  SELECT id, username, email
+  FROM users
+  WHERE username = ?
+  LIMIT 1
+`
+
 const createUser = `
-  INSERT INTO users (email, password, is_email_verified, auth_provider, avatar, avatar_public_id, created_at, updated_at)
-  VALUES (?, ?, false, 'local', ?, ?, NOW(), NOW())
+  INSERT INTO users (username, email, password, is_email_verified, auth_provider, avatar, avatar_public_id, created_at, updated_at)
+  VALUES (?, ?, ?, false, 'local', ?, ?, NOW(), NOW())
 `
 
 const createSession = `
@@ -45,6 +52,7 @@ const verifyUserEmail = `
 
 export {
   findUserByEmail,
+  findUserByUsername,
   createUser,
   createSession,
   findSessionByRefreshToken,

@@ -34,8 +34,8 @@ const register = catchAsync(async (req, res) => {
   const errors = validationResult(req)
   if (!errors.isEmpty()) throw new AppError('Validation failed', 400, errors.array())
 
-  const { email, password } = req.body
-  const result = await authService.register({ email, password })
+  const { email, password, username } = req.body
+  const result = await authService.register({ email, password, username })
 
   res.status(201).json({
     status: 'success',

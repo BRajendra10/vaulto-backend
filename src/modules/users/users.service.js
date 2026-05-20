@@ -9,8 +9,23 @@ const getMe = async (userId) => {
   return rows[0]
 }
 
-const updateProfile = async (userId, { avatar }) => {
-  await pool.execute(q.updateProfile, [avatar, userId])
+const updateProfile = async (userId, { avatar, username }) => {
+  if (avatar !== undefined) {
+    await pool.execute(q.updateProfile, [avatar, userId])
+  }
+
+  if (username !== undefined) {
+    const [existing] = await pool.execute(q.findByUsernameExcludingId, [username, userId])
+    if (existing.length > 0) throw new AppError('This name is already registered', 409)
+
+    try {
+      await pool.execute(q.updateUsername, [username, userId])
+    } catch (err) {
+      if (err.code === 'ER_DUP_ENTRY') throw new AppError('This name is already registered', 409)
+      throw err
+    }
+  }
+
   const [rows] = await pool.execute(q.findById, [userId])
   return rows[0]
 }

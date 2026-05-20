@@ -34,21 +34,30 @@ const getRefreshTokenExpiry = () => {
 
 // ── Service functions ─────────────────────────────────────────────
 
-const register = async ({ email, password }) => {
-  // Check if email is already taken
-  const [existing] = await pool.execute(q.findUserByEmail, [email])
-  if (existing.length > 0) throw new AppError('An account with this email already exists', 409)
+const register = async ({ email, password, username }) => {
+  const [existingEmail] = await pool.execute(q.findUserByEmail, [email])
+  if (existingEmail.length > 0) throw new AppError('An account with this email already exists', 409)
 
-  // Hash password before storing
+  const [existingName] = await pool.execute(q.findUserByUsername, [username])
+  if (existingName.length > 0) throw new AppError('This name is already registered', 409)
+
   const hashedPassword = await bcrypt.hash(password, 12)
 
-  // Get default avatar values
   const avatar = process.env.DEFAULT_AVATAR_URL
   const avatarPublicId = process.env.DEFAULT_AVATAR_PUBLIC_ID
 
-  // Create the user
-  const [result] = await pool.execute(q.createUser, [email, hashedPassword, avatar, avatarPublicId])
-  const userId = result.insertId
+  let userId
+  try {
+    const [result] = await pool.execute(q.createUser, [username, email, hashedPassword, avatar, avatarPublicId])
+    userId = result.insertId
+  } catch (err) {
+    if (err.code === 'ER_DUP_ENTRY') {
+      const key = `${err.sqlMessage || ''}`.toLowerCase()
+      if (key.includes('username')) throw new AppError('This name is already registered', 409)
+      throw new AppError('An account with this email already exists', 409)
+    }
+    throw err
+  }
 
   // Generate OTP
   const otp = generateOTP()

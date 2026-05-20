@@ -7,6 +7,11 @@ const router = Router()
 
 // ── Validation rules ──────────────────────────────────────────────
 const registerValidation = [
+  body('username')
+    .trim()
+    .notEmpty().withMessage('Name is required')
+    .isLength({ min: 2, max: 50 }).withMessage('Name must be between 2 and 50 characters')
+    .matches(/^[^<>\/\\;]*$/).withMessage('Name contains invalid characters'),
   body('email')
     .isEmail().withMessage('Please provide a valid email')
     .normalizeEmail(),
