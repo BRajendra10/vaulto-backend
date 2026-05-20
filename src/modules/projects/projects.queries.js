@@ -1,11 +1,44 @@
 const findAllByUser = `
-  SELECT p.id, p.project_name, p.description, p.owner_id, p.is_active, p.created_at, p.updated_at, m.role
+  SELECT 
+    p.id,
+    p.project_name,
+    p.description,
+    p.owner_id,
+    p.is_active,
+    p.created_at,
+    p.updated_at,
+    m.role,
+
+    COUNT(DISTINCT s.id) AS secrets_count,
+    COUNT(DISTINCT pm.user_id) AS maintainers_count
+
   FROM project p
-  JOIN maintainer m ON m.project_id = p.id
-  WHERE m.user_id = ? AND p.deleted_at IS NULL
+
+  JOIN maintainer m 
+    ON m.project_id = p.id
+
+  LEFT JOIN secret s 
+    ON s.project_id = p.id
+    AND s.deleted_at IS NULL
+
+  LEFT JOIN maintainer pm 
+    ON pm.project_id = p.id
+
+  WHERE m.user_id = ?
+    AND p.deleted_at IS NULL
+
+  GROUP BY
+    p.id,
+    p.project_name,
+    p.description,
+    p.owner_id,
+    p.is_active,
+    p.created_at,
+    p.updated_at,
+    m.role
+
   ORDER BY p.created_at DESC
 `
-  // LIMIT ? OFFSET ?
 
 const countByUser = `
   SELECT COUNT(*) AS total

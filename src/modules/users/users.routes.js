@@ -2,6 +2,7 @@ import { Router } from 'express'
 import { body } from 'express-validator'
 import * as usersController from './users.controller.js'
 import authenticate from '../../middlewares/authenticate.js'
+import { upload } from '../../middlewares/uploadAvatar.js'
 
 const router = Router()
 
@@ -26,6 +27,8 @@ const passwordUpdateValidation = [
 router.use(authenticate)
 
 router.get('/me', usersController.getMe)
+
+router.patch('/avatar', upload.single('avatar'), usersController.updateAvatar)
 
 router.patch('/me',
   validateProfile,

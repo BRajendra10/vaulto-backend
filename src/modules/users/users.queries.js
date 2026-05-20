@@ -31,4 +31,23 @@ const findPasswordById = `
   SELECT password FROM users WHERE id = ? LIMIT 1
 `
 
-export { findById, findByUsernameExcludingId, updateProfile, updateUsername, updatePassword, findPasswordById }
+const findAvatarById = `
+  SELECT avatar, avatar_public_id FROM users WHERE id = ? LIMIT 1
+`
+
+const updateAvatar = `
+  UPDATE users
+  SET avatar = ?, avatar_public_id = ?, updated_at = NOW()
+  WHERE id = ?
+`
+
+export {
+  findById,
+  findByUsernameExcludingId,
+  updateProfile,
+  updateUsername,
+  updatePassword,
+  findPasswordById,
+  findAvatarById,
+  updateAvatar,
+}

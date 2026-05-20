@@ -12,46 +12,59 @@ const imagekit = new ImageKit({
 });
 
 // --------------------
-// Upload Image (from multer local file)
+// Upload Image
 // --------------------
 export const uploadImage = async (filePath) => {
   try {
+    // Read uploaded file
     const file = fs.readFileSync(filePath);
 
+    // Upload to ImageKit
     const res = await imagekit.upload({
-      file,
+      file: file,
       fileName: path.basename(filePath),
       folder: "/avatars",
     });
 
-    fs.unlinkSync(filePath);
+    // Remove local file after successful upload
+    if (fs.existsSync(filePath)) {
+      fs.unlinkSync(filePath);
+    }
 
     return {
       url: res.url,
       fileId: res.fileId,
     };
   } catch (error) {
-    throw new Error("Image upload failed");
+    console.log(error)
+    console.error("ImageKit upload failed:", error);
+
+    // Cleanup local file if upload fails
+    if (fs.existsSync(filePath)) {
+      fs.unlinkSync(filePath);
+    }
+
+    throw new Error(error?.message || "Image upload failed");
   }
 };
 
 // --------------------
-// Delete Image (by fileId)
+// Delete Image
 // --------------------
 export const deleteImage = async (fileId) => {
   try {
-    if (!fileId) return;
+    if (!fileId) return null;
 
     return await imagekit.deleteFile(fileId);
   } catch (error) {
-    // do not crash app on delete failure
+    // Don't crash app if deletion fails
     console.error("Delete image failed:", error.message);
-    return null
+    return null;
   }
 };
 
 // --------------------
-// Get Default Avatar
+// Default Avatar
 // --------------------
 export const getDefaultAvatar = () => {
   return {

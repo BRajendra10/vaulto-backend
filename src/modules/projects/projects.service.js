@@ -7,7 +7,7 @@ import { getPagination, paginatedResponse } from '../../utils/pagination.js'
 
 const getAllProjects = async (userId, query) => {
   const { page, limit, offset } = getPagination(query)
-  const [rows] = await pool.execute(`${q.findAllByUser} LIMIT ${limit} OFFSET ${offset}`, [userId])
+  const [rows] = await pool.execute(`${q.findAllByUser} LIMIT ${limit} OFFSET ${offset}`, [userId]);
   const [[{ total }]] = await pool.execute(q.countByUser, [userId])
   return paginatedResponse(rows, total, page, limit)
 }

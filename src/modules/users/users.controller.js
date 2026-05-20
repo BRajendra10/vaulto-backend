@@ -24,4 +24,16 @@ const updatePassword = catchAsync(async (req, res) => {
   res.status(200).json({ status: 'success', message: 'Password updated successfully' })
 })
 
-export { getMe, updateProfile, updatePassword }
+const updateAvatar = catchAsync(async (req, res) => {
+  if (!req.file) throw new AppError('Avatar image is required', 400)
+
+  const data = await usersService.updateAvatar(req.user.id, req.file.path)
+
+  res.status(200).json({
+    status: 'success',
+    message: 'Avatar updated successfully',
+    data,
+  })
+})
+
+export { getMe, updateProfile, updatePassword, updateAvatar }

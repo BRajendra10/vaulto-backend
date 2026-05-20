@@ -1,7 +1,9 @@
+import fs from 'fs'
 import bcrypt from 'bcryptjs'
 import { pool } from '../../db/pool.js'
 import * as q from './users.queries.js'
 import AppError from '../../utils/AppError.js'
+import { uploadImage, deleteImage } from '../../utils/Imagekit.js'
 
 const getMe = async (userId) => {
   const [rows] = await pool.execute(q.findById, [userId])
@@ -30,6 +32,33 @@ const updateProfile = async (userId, { avatar, username }) => {
   return rows[0]
 }
 
+const updateAvatar = async (userId, filePath) => {
+  const [rows] = await pool.execute(q.findAvatarById, [userId])
+  if (rows.length === 0) throw new AppError('User not found', 404)
+
+    console.log(filePath);
+
+  const { avatar_public_id: oldFileId } = rows[0]
+  const defaultFileId = process.env.DEFAULT_AVATAR_PUBLIC_ID
+
+  if (oldFileId && oldFileId !== defaultFileId) {
+    await deleteImage(oldFileId)
+  }
+
+  try {
+    const { url, fileId } = await uploadImage(filePath)
+    await pool.execute(q.updateAvatar, [url, fileId, userId])
+    return { avatar: url }
+  } catch (err) {
+    if (fs.existsSync(filePath)) fs.unlinkSync(filePath)
+    if (err instanceof AppError) throw err
+
+    // Preserve detailed ImageKit error message coming from utils/Imagekit.js
+    const message = err?.message || 'Image upload failed'
+    throw new AppError(message, 500)
+  }
+}
+
 const updatePassword = async (userId, { currentPassword, newPassword }) => {
   // Verify current password first
   const [rows] = await pool.execute(q.findPasswordById, [userId])
@@ -42,4 +71,4 @@ const updatePassword = async (userId, { currentPassword, newPassword }) => {
   await pool.execute(q.updatePassword, [hashed, userId])
 }
 
-export { getMe, updateProfile, updatePassword }
+export { getMe, updateProfile, updateAvatar, updatePassword }
