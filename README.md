@@ -1,19 +1,19 @@
 # Vaulto Backend API
 
-Vaulto is a secure **Secrets Management and Vault Service** backend built with Node.js and MySQL. It is designed to provide encrypted storage for sensitive project data with granular access control, detailed audit logging, and a high-assurance authentication framework.
+Vaulto is a secure **Secrets Management and Vault Service** backend built with Node.js and MySQL. It provides encrypted storage for sensitive project data with granular access control, detailed audit logging, and a high-assurance authentication framework.
 
-## 🛠 Tech Stack
+## ✅ Tech Stack
 
 - **Runtime**: Node.js
 - **Framework**: Express.js
-- **Database**: MySQL (Raw SQL approach)
+- **Database**: MySQL (raw SQL approach)
 - **Authentication**: JWT (Access Tokens) + Opaque Refresh Tokens
-- **Security**: Bcrypt (Passwords), SHA-256 (OTP), Crypto (Refresh Tokens)
+- **Security**: bcrypt (passwords), SHA-256 (OTP), crypto (refresh token encryption/handling)
 - **File Storage**: ImageKit.io
 - **Email**: Nodemailer (SMTP/Gmail)
-- **Validation**: Express-Validator
+- **Validation**: express-validator
 
-## 📂 Folder Structure
+## 📁 Folder Structure
 
 ```text
 src/
@@ -21,56 +21,48 @@ src/
 ├── db/                 # Database pool and migration scripts
 ├── middlewares/        # Auth guards and global error handling
 ├── modules/            # Domain-driven logic
-│   ├── auth/           # Identity & Session Management
-│   ├── projects/       # Vault/Project structure (CRUD)
+│   ├── auth/           # Identity & session management
+│   ├── projects/      # Vault/Project CRUD
 │   ├── maintainers/    # RBAC (Role-Based Access Control)
 │   └── audit/          # Security event logging
-├── utils/              # Shared helpers (Mail, Crypto, ImageKit, Pagination)
-└── constants/          # Application-wide constants
+└── utils/              # Shared helpers (mailer, crypto, ImageKit, pagination)
 ```
 
-## 🚀 Core Systems & Logic
+## 👀 Preview Links
 
-### 1. Authentication & Security Flow
-The system implements a multi-step verification process:
-- **Registration**: Creates a user with `is_email_verified: false`. Generates a 6-digit OTP, hashes it using SHA-256, and sends it via email.
-- **OTP Verification**: Uses a **SQL Transaction** to atomically verify the user, delete the OTP record, and create the initial session.
-- **Session Management**: 
-    - **Access Tokens**: Short-lived (15m), stored in `httpOnly` cookies for browser security.
-    - **Refresh Tokens**: Long-lived, stored in the database.
-    - **Token Rotation**: Every refresh request revokes the old refresh token and issues a new one, mitigating the risk of stolen session tokens.
-- **Security Features**: Protects against email enumeration by using generic error messages on sensitive endpoints.
+- **Watch Demo:** [View Here](https://drive.google.com/file/d/1_g2SyaP_WNV39AbhTBAQBpEbpffN_zUN/view?usp=sharing)
 
-### 2. Media Management (ImageKit)
-Integrated via `utils/Imagekit.js`:
-- Handles avatar uploads from local storage to ImageKit.
-- Automatic cleanup of local temporary files using `fs.unlinkSync`.
-- Secure deletion logic that prevents the app from crashing on media-server failures.
+---
 
-### 3. Error Handling Architecture
-- **AppError**: A custom error class that distinguishes between "Operational Errors" (expected validation/auth failures) and "Programming Errors" (bugs).
-- **catchAsync**: A wrapper that eliminates `try/catch` boilerplate in controllers by forwarding errors to the global handler.
-- **Global Handler**: Standardizes all API errors into a consistent JSON format:
-  ```json
-  {
-    "status": "error",
-    "message": "User-friendly message",
-    "errors": []
-  }
-  ```
+## 🔐 Core Systems & Logic
 
-### 4. Database & Queries
-- Uses raw SQL queries defined in `.queries.js` files to maintain full control over database performance.
-- Implements a connection pool for efficiency.
-- Supports session tracking including IP Address and User-Agent for security auditing.
+### 1) Authentication & Security Flow (high level)
+- **Registration**: Creates a user with `is_email_verified: false`, generates a 6-digit OTP, hashes it using SHA-256, and sends it via email.
+- **OTP Verification**: Uses a **SQL transaction** to atomically verify the user, delete the OTP record, and create the initial session.
+- **Session Management**:
+  - **Access tokens**: short-lived (~15m) via `httpOnly` cookies
+  - **Refresh tokens**: long-lived, stored in DB
+  - **Rotation**: each refresh revokes the old refresh token and issues a new one
+- **Security features**: reduces information leakage (e.g., generic responses to prevent email enumeration).
 
-### 5. API Utilities
-- **Pagination**: Standardized `getPagination` and `paginatedResponse` helpers to ensure all list endpoints follow the same metadata structure.
-- **Mailer**: Centralized Nodemailer transporter with HTML/Text support.
+### 2) Media Management (ImageKit)
+Implemented in `utils/Imagekit.js`.
+
+### 3) Error Handling Architecture
+- **AppError** distinguishes operational vs programming errors.
+- **catchAsync** forwards controller errors to the global error handler.
+- Global handler returns a consistent JSON error response.
+
+### 4) Database & Queries
+- Raw SQL in `*.queries.js` files.
+- Connection pool for efficiency.
+- Session tracking includes IP and User-Agent (auditing/security).
 
 ## ⚙️ Environment Variables
 
-Create a `.env` file in the root directory:
+Create a `.env` file in `vaulto-backend/`.
+
+> Note: the backend **fails fast** on startup if any required variables are missing (see `src/config/index.js`).
 
 ```env
 # Server
@@ -79,51 +71,74 @@ NODE_ENV=development
 
 # Database
 DB_HOST=localhost
+DB_PORT=3306
 DB_USER=root
 DB_PASSWORD=your_password
 DB_NAME=vaulto
 
-# Security
+# Authentication / Security
 JWT_SECRET=your_secret
 JWT_REFRESH_SECRET=your_refresh_secret
+JWT_EXPIRES_IN=15m
+JWT_REFRESH_EXPIRES_IN=7d
 ENCRYPTION_KEY=your_32_char_key
 
+# Defaults
+DEFAULT_AVATAR_URL=
+DEFAULT_AVATAR_PUBLIC_ID=
+
 # ImageKit
-IMAGEKIT_PUBLIC_KEY=...
-IMAGEKIT_PRIVATE_KEY=...
-IMAGEKIT_URL_ENDPOINT=...
+IMAGEKIT_PUBLIC_KEY=
+IMAGEKIT_PRIVATE_KEY=
+IMAGEKIT_URL_ENDPOINT=
 
 # Email
-EMAIL_USER=...
-EMAIL_PASS=...
-
-# Defaults
-DEFAULT_AVATAR_URL=...
-DEFAULT_AVATAR_PUBLIC_ID=...
+EMAIL_USER=
+EMAIL_PASS=
 ```
 
-## 🛠 Development Commands
+## 🧰 Development Commands
 
-### Installation
+### Install
 ```bash
 npm install
 ```
 
-### Run Migrations
+### Run migrations
 ```bash
 node src/db/migrations/run.js
 ```
 
-### Start Server
+### Start server
 ```bash
 npm start
 ```
 
-## 🛡 Security Best Practices Implemented
+### Dev mode
+```bash
+npm run dev
+```
 
-1.  **Passwords**: Hashed with Bcrypt (Salt cost: 12).
-2.  **XSS Protection**: Tokens served via `httpOnly` cookies.
-3.  **CSRF Protection**: `sameSite: 'strict'` cookie policy.
-4.  **SQL Injection**: All queries use prepared statements via `mysql2`.
-5.  **Fail-Fast**: Config loader validates environment variables on startup.
-6.  **Generic Errors**: Prevents data leaking via error messages.
+## 🛡️ Security Best Practices Implemented
+
+1. **Passwords**: bcrypt (salt cost: 12)
+2. **XSS protection**: tokens served via `httpOnly` cookies
+3. **CSRF mitigation**: `sameSite: 'strict'` cookie policy
+4. **SQL injection protection**: prepared statements via `mysql2`
+5. **Fail-fast config**: validated on startup
+6. **Generic errors**: avoid leaking sensitive data in error messages
+
+---
+
+## ❤️ Links / Contact
+
+Made by **Rajendra Behera**
+
+**Email:** [rajendrabehera8116@gmail.com](mailto:rajendrabehera8116@gmail.com)  
+**LinkedIn:** [/behera-rajendra](https://www.linkedin.com/in/behera-rajendra/)  
+**GitHub:** [/BRajendra10](https://github.com/BRajendra10)  
+
+**Frontend:** [EdTech-Frontend](https://github.com/BRajendra10/vaulto-frontend)  
+**Backend:** [EdTech-Backend](https://github.com/BRajendra10/vaulto-backend/)  
+
+---
