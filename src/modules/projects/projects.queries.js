@@ -4,6 +4,7 @@ const findAllByUser = `
     p.project_name,
     p.description,
     p.owner_id,
+    p.api_key,
     p.is_active,
     p.created_at,
     p.updated_at,
