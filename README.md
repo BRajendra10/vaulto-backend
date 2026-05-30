@@ -130,15 +130,21 @@ npm run dev
 
 ---
 
-## ❤️ Links / Contact
+## ❤️ Connect
 
-Made by **Rajendra Behera**
+| Platform | Link |
+|-----------|------|
+| Email | rajendrabehera8116@gmail.com |
+| LinkedIn | https://www.linkedin.com/in/behera-rajendra |
+| GitHub | https://github.com/BRajendra10 |
 
-**Email:** [rajendrabehera8116@gmail.com](mailto:rajendrabehera8116@gmail.com)  
-**LinkedIn:** [/behera-rajendra](https://www.linkedin.com/in/behera-rajendra/)  
-**GitHub:** [/BRajendra10](https://github.com/BRajendra10)  
+### Source Code
 
-**Frontend:** [EdTech-Frontend](https://github.com/BRajendra10/vaulto-frontend)  
-**Backend:** [EdTech-Backend](https://github.com/BRajendra10/vaulto-backend/)  
+| Repository | Link |
+|------------|------|
+| Frontend | https://github.com/BRajendra10/vaulto-frontend |
+| Backend | https://github.com/BRajendra10/vaulto-backend |
 
----
+--- 
+
+⭐ If you found this project useful, consider giving it a star.
