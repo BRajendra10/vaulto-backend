@@ -15,7 +15,7 @@ const pool = mysql.createPool({
   timezone: 'Z',        // store all dates as UTC
 
   ssl: {
-    rejectUnauthorized: false
+    rejectUnauthorized: true
   }
 })
 
