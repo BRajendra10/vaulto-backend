@@ -12,7 +12,7 @@ import AppError from '../../utils/AppError.js'
 const COOKIE_OPTIONS = {
   httpOnly: true,
   secure: process.env.NODE_ENV === 'production',
-  sameSite: 'lax',
+  sameSite: 'none', // allow cross-site cookies for refresh token
 }
 
 const setAccessTokenCookie = (res, accessToken) => {
