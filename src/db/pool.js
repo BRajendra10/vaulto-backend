@@ -15,6 +15,7 @@ const pool = mysql.createPool({
   timezone: 'Z',        // store all dates as UTC
 
   ssl: {
+    ca: fs.readFileSync("./src/certs/ca.pem"),
     rejectUnauthorized: true
   }
 })
