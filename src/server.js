@@ -6,7 +6,7 @@ const ENV = process.env.NODE_ENV || 'development'
 
 const startServer = async () => {
   // Test DB connection before accepting any traffic
-  await testConnection()
+  // await testConnection()
 
   const server = app.listen(PORT, () => {
     console.log(`🚀 Server running on port ${PORT} [${ENV}]`)

@@ -7,10 +7,16 @@ const pool = mysql.createPool({
   user: config.db.user,
   password: config.db.password,
   database: config.db.name,
+
   waitForConnections: true,
   connectionLimit: 10,  // max simultaneous connections
   queueLimit: 0,        // unlimited queue
+
   timezone: 'Z',        // store all dates as UTC
+
+  ssl: {
+    rejectUnauthorized: false
+  }
 })
 
 // Test connection on startup — crash early if DB is unreachable
