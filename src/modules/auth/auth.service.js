@@ -68,7 +68,10 @@ const register = async ({ email, password, username }) => {
   await pool.execute(otpQ.deleteOTPByUserId, [userId])
 
   await pool.execute(otpQ.createOTP, [userId, otpHash, expiresAt])
-  await sendOTPEmail(email, otp)
+  // await sendOTPEmail(email, otp)
+  sendOTPEmail(email, otp).catch(err => {
+    console.error("OTP email failed:", err.message)
+  })
 
   return { message: 'Registration successful. Please check your email to verify your account.' }
 }
@@ -115,7 +118,7 @@ const verifyEmailOTP = async ({ email, otp, ipAddress, userAgent }) => {
 
 const resendOTP = async (email) => {
   const [users] = await pool.execute(q.findUserByEmail, [email])
-  
+
   // Generic success message to prevent email enumeration
   if (users.length === 0) {
     return { message: 'If an account exists with this email, a new OTP has been sent.' }
@@ -134,7 +137,10 @@ const resendOTP = async (email) => {
   const expiresAt = new Date(Date.now() + 10 * 60 * 1000)
 
   await pool.execute(otpQ.createOTP, [user.id, otpHash, expiresAt])
-  await sendOTPEmail(email, otp)
+  // await sendOTPEmail(email, otp)
+  sendOTPEmail(email, otp).catch(err => {
+    console.error("OTP email failed:", err.message)
+  })
 
   return { message: 'If an account exists with this email, a new OTP has been sent.' }
 }
@@ -166,7 +172,7 @@ const refreshAccessToken = async (refreshToken) => {
   const tokenHash = hashToken(refreshToken)
   const [rows] = await pool.execute(q.findSessionByRefreshToken, [tokenHash])
   if (rows.length === 0) throw new AppError('Invalid session', 401)
-  
+
   const session = rows[0]
 
   // REUSE DETECTION: If token is revoked, someone reused an old token. Compromise!
