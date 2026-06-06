@@ -16,8 +16,6 @@ const transporter = nodemailer.createTransport({
 })
 
 export const sendOTPEmail = async (email, otp) => {
-  console.log('EMAIL START', email)
-
   const mailOptions = {
     from: `"Vaulto Support" <${process.env.EMAIL_USER}>`,
     to: email,
@@ -27,8 +25,5 @@ export const sendOTPEmail = async (email, otp) => {
   }
 
   const info = await transporter.sendMail(mailOptions)
-
-  console.log('EMAIL SUCCESS', info.messageId)
-
   return info
 }

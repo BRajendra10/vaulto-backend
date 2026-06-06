@@ -46,10 +46,10 @@ const register = async ({ email, password, username }) => {
   const avatar = process.env.DEFAULT_AVATAR_URL
   const avatarPublicId = process.env.DEFAULT_AVATAR_PUBLIC_ID
 
-  let userId
+  // let userId
   try {
     const [result] = await pool.execute(q.createUser, [username, email, hashedPassword, avatar, avatarPublicId])
-    userId = result.insertId
+    // userId = result.insertId
   } catch (err) {
     if (err.code === 'ER_DUP_ENTRY') {
       const key = `${err.sqlMessage || ''}`.toLowerCase()
@@ -59,19 +59,19 @@ const register = async ({ email, password, username }) => {
     throw err
   }
 
-  // Generate OTP
-  const otp = generateOTP()
-  const otpHash = hashToken(otp)
-  const expiresAt = new Date(Date.now() + 10 * 60 * 1000) // 10 min
+  // // Generate OTP - Temporarily disabled for Gmail SMTP handshake issues
+  // const otp = generateOTP()
+  // const otpHash = hashToken(otp)
+  // const expiresAt = new Date(Date.now() + 10 * 60 * 1000) // 10 min
 
-  // Delete existing OTP (if any) — ensures clean state
-  await pool.execute(otpQ.deleteOTPByUserId, [userId])
+  // // Delete existing OTP (if any) — ensures clean state
+  // await pool.execute(otpQ.deleteOTPByUserId, [userId])
 
-  await pool.execute(otpQ.createOTP, [userId, otpHash, expiresAt])
-  // await sendOTPEmail(email, otp)
-  sendOTPEmail(email, otp).catch(err => {
-    console.error("OTP email failed:", err.message)
-  })
+  // await pool.execute(otpQ.createOTP, [userId, otpHash, expiresAt])
+  // // await sendOTPEmail(email, otp)
+  // sendOTPEmail(email, otp).catch(err => {
+  //   console.error("OTP email failed:", err.message)
+  // })
 
   return { message: 'Registration successful. Please check your email to verify your account.' }
 }
@@ -152,8 +152,8 @@ const login = async ({ email, password, ipAddress, userAgent }) => {
 
   const user = rows[0]
 
-  // Enforce email verification
-  if (!user.is_email_verified) throw new AppError('Please verify your email first', 403)
+  // Enforce email verification - temporarily disabled for Gmail SMTP handshake issues
+  // if (!user.is_email_verified) throw new AppError('Please verify your email first', 403)
 
   // Verify password against stored hash
   const isPasswordValid = await bcrypt.compare(password, user.password)
